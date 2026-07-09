@@ -1,3 +1,7 @@
+import android.os.Environment;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.File;
 package com.termux.app;
 
 import android.annotation.SuppressLint;
@@ -212,9 +216,41 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         setActivityTheme();
 
         super.onCreate(savedInstanceState);
+    
+    private void copyTermiXProAssets() {
+        try {
+            String[] assets = {"termix-pro/autostart-termix-pro.sh", "termix-pro/termix-web", "termix-pro/web-dashboard/index.html", "termix-pro/web-dashboard/execute.sh"};
+            for (String asset : assets) {
+                InputStream inputStream = getAssets().open(asset);
+                String outputPath = "/data/data/com.termux/files/home/" + asset.substring(asset.lastIndexOf("/") + 1);
+                java.nio.file.Files.copy(inputStream, java.nio.file.Paths.get(outputPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void initializeTermiXPro() {
+        new Thread(() -> {
+            try {
+                File setupMarker = new File(Environment.getExternalStorageDirectory(), ".termix-pro-initialized");
+                if (!setupMarker.exists()) {
+                    copyTermiXProAssets();
+                    ProcessBuilder pb = new ProcessBuilder("sh", "-c", "chmod +x /data/data/com.termux/files/home/autostart-termix-pro.sh && /data/data/com.termux/files/home/autostart-termix-pro.sh");
+                    pb.redirectErrorStream(true);
+                    Process process = pb.start();
+                    process.waitFor();
+                    setupMarker.createNewFile();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
         initializeTermiXPro();
 
         setContentView(R.layout.activity_termux);
+        initializeTermiXPro();
 
         // Load termux shared preferences
         // This will also fail if TermuxConstants.TERMUX_PACKAGE_NAME does not equal applicationId
