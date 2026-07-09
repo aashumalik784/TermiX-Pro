@@ -26,8 +26,17 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assembleDebug
     
+    - name: List APK files
+      run: |
+        echo "Searching for APK files..."
+        find . -name "*.apk" -type f
+        ls -lh app/build/outputs/apk/debug/ || echo "Debug APK not found"
+        ls -lh app/build/outputs/apk/release/ || echo "Release APK not found"
+    
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: TermiX-Pro-APK
         path: app/build/outputs/apk/debug/app-debug.apk
+        if-no-files-found: error
+        retention-days: 30
