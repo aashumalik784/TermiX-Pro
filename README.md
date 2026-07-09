@@ -86,3 +86,40 @@ MIT License - see LICENSE file for details
 ## 👨‍💻 Author
 
 Aashu Malik (@aashumalik784)
+
+## 🚀 TermiX-Pro Setup
+
+After installing the APK, run this command once to set up the development environment:
+
+```bash
+pkg install proot-distro -y
+proot-distro install ubuntu
+proot-distro login ubuntu
+```
+
+Inside Ubuntu, run:
+
+```bash
+apt update && apt install -y python3 openjdk-21-jdk g++ nodejs npm php golang-go rustc cargo ruby nginx fcgiwrap spawn-fcgi mysql-client postgresql docker.io kotlin
+```
+
+For Dart:
+
+```bash
+wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/3.5.4/sdk/dartsdk-linux-x64-release.zip
+unzip -q dartsdk-linux-x64-release.zip -d /usr/lib/
+ln -sf /usr/lib/dart-sdk/bin/dart /usr/local/bin/dart
+rm -f dartsdk-linux-x64-release.zip
+```
+
+## 🌐 Web Dashboard
+
+Start web dashboard:
+
+```bash
+# Inside Ubuntu
+nginx
+spawn-fcgi -s /run/fcgiwrap.socket -M 766 -- /usr/sbin/fcgiwrap
+```
+
+Then open browser: `http://localhost:8080`
