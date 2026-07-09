@@ -73,3 +73,10 @@ google-services.json
 # Android Profiling
 *.hprof
 >>>>>>> 02a5c4a2af4ff39f2fcaaa5635e5358cac8e92f3
+# TermiX-Pro specific
+*.log
+.env
+local.properties
+.gradle/
+build/
+app/build/
