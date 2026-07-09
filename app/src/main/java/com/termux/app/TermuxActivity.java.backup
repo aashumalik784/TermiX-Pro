@@ -1011,16 +1011,3 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     }
 
 }
-
-    // TermiX-Pro Auto-Setup
-    private void initializeTermiXPro() {
-        new Thread(() -> {
-            java.io.File setupMarker = new java.io.File(android.os.Environment.getExternalStorageDirectory(), ".termix-pro-initialized");
-            if (!setupMarker.exists()) {
-                try {
-                    ProcessBuilder pb = new ProcessBuilder("sh", "-c", "sh /data/data/com.termux/files/home/termux-app/scripts/autostart-termix-pro.sh");
-                    pb.start().waitFor();
-                } catch (Exception e) { e.printStackTrace(); }
-            }
-        }).start();
-    }
