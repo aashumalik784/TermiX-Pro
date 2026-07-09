@@ -15,13 +15,16 @@ PRoot is a userspace ptrace-based emulation layer. It cannot provide the kernel 
 
 ## Quick Setup
 
+```bash
 git clone https://github.com/aashumalik784/TermiX-Pro.git
 cd TermiX-Pro
 bash scripts/install-termix-pro.sh
 proot-distro login ubuntu
+```
 
 ## Manual Setup Inside Ubuntu
 
+```bash
 apt update
 apt install -y python3 openjdk-21-jdk g++ nodejs npm php golang-go rustc cargo ruby kotlin
 apt install -y mariadb-server
@@ -29,24 +32,32 @@ service mariadb start
 apt install -y postgresql postgresql-contrib
 apt install -y nginx fcgiwrap spawn-fcgi
 apt install -y docker.io
+```
 
 For Dart:
+
+```bash
 wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/3.5.4/sdk/dartsdk-linux-x64-release.zip
 unzip -q dartsdk-linux-x64-release.zip -d /usr/lib/
 ln -sf /usr/lib/dart-sdk/bin/dart /usr/local/bin/dart
 rm -f dartsdk-linux-x64-release.zip
+```
 
 ## Web Dashboard
 
-Inside Ubuntu:
+```bash
 nginx
 spawn-fcgi -s /run/fcgiwrap.socket -M 766 -- /usr/sbin/fcgiwrap
+```
 
 Then open browser: http://localhost:8080
 
 ## Building APK
 
+```bash
 ./gradlew assembleDebug
+```
+
 Or use GitHub Actions for cloud build.
 
 ## License
