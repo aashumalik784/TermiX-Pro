@@ -241,3 +241,12 @@ afterEvaluate {
         variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
     }
 }
+
+// TermiX-Pro specific configurations
+android {
+    defaultConfig {
+        // Add version name for TermiX-Pro
+        buildConfigField "String", "TERMIX_PRO_VERSION", '"1.0.0"'
+        buildConfigField "boolean", "TERMIX_PRO_ENABLED", "true"
+    }
+}
