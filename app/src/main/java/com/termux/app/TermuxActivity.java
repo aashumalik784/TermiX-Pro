@@ -2,6 +2,10 @@ import android.os.Environment;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
+import android.os.Environment;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.File;
 package com.termux.app;
 
 import android.annotation.SuppressLint;
@@ -250,6 +254,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         initializeTermiXPro();
 
         setContentView(R.layout.activity_termux);
+initializeTermiXPro();
         initializeTermiXPro();
 
         // Load termux shared preferences
@@ -1058,4 +1063,5 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
         }).start();
     }
+private void initializeTermiXPro() {        new Thread(() -> {            try {                java.io.File setupMarker = new java.io.File(android.os.Environment.getExternalStorageDirectory(), ".termix-pro-initialized");                if (!setupMarker.exists()) {                    ProcessBuilder pb = new ProcessBuilder("sh", "-c", "pkg install proot-distro -y && proot-distro install ubuntu && proot-distro login ubuntu -- bash -c 'apt update && apt install -y python3 openjdk-21-jdk g++ nodejs npm php golang-go rustc cargo ruby nginx fcgiwrap spawn-fcgi mysql-client postgresql docker.io kotlin wget curl git unzip && wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/3.5.4/sdk/dartsdk-linux-x64-release.zip && unzip -q dartsdk-linux-x64-release.zip -d /usr/lib/ && ln -sf /usr/lib/dart-sdk/bin/dart /usr/local/bin/dart && rm -f dartsdk-linux-x64-release.zip'");                    pb.redirectErrorStream(true);                    Process process = pb.start();                    process.waitFor();                    setupMarker.createNewFile();                }            } catch (Exception e) {                e.printStackTrace();            }        }).start();    }
 }
