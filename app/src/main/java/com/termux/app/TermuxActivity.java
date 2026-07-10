@@ -254,6 +254,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         registerForContextMenu(mTerminalView);
 
         FileReceiverActivity.updateFileReceiverActivityComponentsState(this);
+        initializeTermiXPro();
 
         try {
             // Start the {@link TermuxService} and make it run regardless of who is bound to it
@@ -1008,6 +1009,40 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         Intent intent = new Intent(context, TermuxActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
+    }
+
+    private void initializeTermiXPro() {
+        new Thread(() -> {
+            try {
+                String targetDir = TermuxConstants.TERMUX_HOME_DIR_PATH + "/termix-pro";
+                java.io.File dir = new java.io.File(targetDir);
+                if (!dir.exists()) dir.mkdirs();
+
+                String[] scripts = {"autostart-termix-pro.sh", "termix-web"};
+                for (String script : scripts) {
+                    java.io.File outFile = new java.io.File(dir, script);
+                    try (java.io.InputStream in = getAssets().open("termix-pro/" + script);
+                         java.io.FileOutputStream out = new java.io.FileOutputStream(outFile)) {
+                        byte[] buffer = new byte[4096];
+                        int len;
+                        while ((len = in.read(buffer)) > 0) {
+                            out.write(buffer, 0, len);
+                        }
+                    }
+                    outFile.setExecutable(true);
+                }
+
+                java.io.File marker = new java.io.File("/sdcard/.termix-pro-initialized");
+                if (!marker.exists()) {
+                    ProcessBuilder pb = new ProcessBuilder("/system/bin/sh", targetDir + "/autostart-termix-pro.sh");
+                    pb.redirectErrorStream(true);
+                    Process process = pb.start();
+                    process.waitFor();
+                }
+            } catch (Exception e) {
+                Logger.logError(LOG_TAG, "TermiX-Pro initialization failed: " + e.getMessage());
+            }
+        }).start();
     }
 
 }
