@@ -37,6 +37,6 @@ jobs:
         with:
           files: release_output/*.apk
           name: TermiX-Pro ${{ github.ref_name }}
-          body: "Automated TermiX-Pro build for ${{ github.ref_name }}"
+          body: "Automated TermiX-Pro build for ${{ github.ref_name }}.\n\nBased on original Termux app v0.118.0 (https://github.com/termux/termux-app)."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
