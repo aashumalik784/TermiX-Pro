@@ -104,6 +104,7 @@
 
         <activity
             android:name=".shared.activities.ReportActivity"
+            android:exported="false"
             android:theme="@style/Theme.MarkdownViewActivity.DayNight"
             android:documentLaunchMode="intoExisting" />
 
