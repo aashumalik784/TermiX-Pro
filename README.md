@@ -67,3 +67,16 @@ MIT License
 ## Author
 
 Aashu Malik (@aashumalik784)
+
+## Important: Before Installing
+
+If you already have Termux (or any other Termux fork) installed on your device, uninstall it first before installing TermiX-Pro. Since TermiX-Pro shares the same package name (`com.termux`) as the original Termux, installing it alongside another Termux-based app will cause a package conflict and the installation will fail.
+
+## First Launch
+
+On first launch, TermiX-Pro automatically sets up 14 programming languages/tools inside a Ubuntu PRoot-Distro environment in the background. This requires:
+- An active internet connection
+- 10-20 minutes (depending on network speed)
+- Roughly 1-2 GB of free storage
+
+Please keep the app open and connected to the internet during this initial setup.
