@@ -1032,8 +1032,16 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                     outFile.setExecutable(true);
                 }
 
-                java.io.File marker = new java.io.File("/sdcard/.termix-pro-initialized");
+                java.io.File marker = new java.io.File(TermuxConstants.TERMUX_HOME_DIR_PATH + "/.termix-pro-initialized");
                 if (!marker.exists()) {
+                    java.io.File pkgBinary = new java.io.File(TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/bin/pkg");
+                    int waited = 0;
+                    while (!pkgBinary.exists() && waited < 120) {
+                        Thread.sleep(2000);
+                        waited += 2;
+                    }
+                    Thread.sleep(3000);
+
                     ProcessBuilder pb = new ProcessBuilder("/system/bin/sh", targetDir + "/autostart-termix-pro.sh");
                     pb.redirectErrorStream(true);
                     Process process = pb.start();
@@ -1044,5 +1052,4 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
         }).start();
     }
-
 }
