@@ -1,61 +1,64 @@
 #!/system/bin/sh
-# TermiX-Pro Auto-Setup Script
+# TermiX-Pro Ultimate Auto-Setup Script
 
 SETUP_MARKER="$HOME/.termix-pro-initialized"
-ROOTFS_URL="https://github.com/aashumalik784/TermiX-Pro/releases/download/rootfs-v1/termix-pro-rootfs-arm64.tar.zst"
+LOCAL_BACKUP="/sdcard/TermiX-Pro/ubuntu-rootfs.tar.zst"
+ROOTFS_DIR="$PREFIX/var/lib/proot-distro/containers/ubuntu"
 
 if [ -f "$SETUP_MARKER" ]; then
-    echo "TermiX-Pro already configured!"
+    echo "✅ TermiX-Pro already configured!"
     exit 0
 fi
 
-echo "Setting up TermiX-Pro Development Environment..."
+echo "🚀 Setting up TermiX-Pro Development Environment..."
+mkdir -p /sdcard/TermiX-Pro
 
-pkg install proot-distro -y
-proot-distro install ubuntu
+# --- FAST PATH: Local Backup Found ---
+if [ -f "$LOCAL_BACKUP" ]; then
+    echo "⚡ Found Local Backup! Fast Setup Starting..."
+    pkg install -y zstd
+    
+    # Clean old container
+    rm -rf "$ROOTFS_DIR"
+    mkdir -p "$PREFIX/var/lib/proot-distro/containers"
+    
+    # Extract backup
+    echo "⏳ Extracting 1.6GB backup (Wait 1-2 mins)..."
+    tar --use-compress-program=unzstd -xf "$LOCAL_BACKUP" \
+        -C "$PREFIX/var/lib/proot-distro/containers/" \
+        --strip-components=9
+        
+    echo "✅ Local Restore Complete!"
 
-FAST_SETUP_DONE=0
-
-if command -v wget >/dev/null 2>&1 || pkg install -y wget; then
-    ROOTFS_PATH="$PREFIX/var/lib/proot-distro/containers/ubuntu/rootfs"
-    echo "Trying fast setup (downloading pre-built environment)..."
-    wget -q -O /sdcard/termix-rootfs.tar.zst "$ROOTFS_URL"
-    if [ -s /sdcard/termix-rootfs.tar.zst ]; then
-        pkg install -y zstd
-        tar --use-compress-program=unzstd -xf /sdcard/termix-rootfs.tar.zst -C "$ROOTFS_PATH" 2>/dev/null
-        if [ $? -eq 0 ]; then
-            FAST_SETUP_DONE=1
-            rm -f /sdcard/termix-rootfs.tar.zst
-            echo "Fast setup successful!"
-        fi
-    fi
-fi
-
-if [ "$FAST_SETUP_DONE" -eq 0 ]; then
-    echo "Fast setup unavailable, falling back to manual install (this will take longer)..."
+# --- SLOW PATH: No Backup, Install from Scratch ---
+else
+    echo " No local backup. Installing from scratch (This will take 15-30 mins)..."
+    pkg install -y proot-distro wget zstd
+    proot-distro install ubuntu
+    
     proot-distro login ubuntu -- bash -c "
-        apt update
-        apt upgrade -y
-
-        apt install -y wget unzip python3 openjdk-21-jdk g++ nodejs npm php golang-go rustc cargo ruby kotlin
-
-        apt install -y nginx fcgiwrap spawn-fcgi
-
-        apt install -y mariadb-server
-        service mariadb start
-
-        apt install -y postgresql postgresql-contrib
-
-        apt install -y docker.io
-
-        wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/3.5.4/sdk/dartsdk-linux-arm64-release.zip
-        unzip -q dartsdk-linux-arm64-release.zip -d /usr/lib/
-        ln -sf /usr/lib/dart-sdk/bin/dart /usr/local/bin/dart
+        export DEBIAN_FRONTEND=noninteractive
+        apt update -y
+        apt install -y python3 openjdk-21-jdk g++ nodejs php golang-go rustc ruby kotlin nginx docker.io mariadb-client postgresql wget unzip curl
+        
+        # Install Dart
+        cd /opt
+        wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-linux-arm64-release.zip
+        unzip -q dartsdk-linux-arm64-release.zip
         rm -f dartsdk-linux-arm64-release.zip
+        ln -sf /opt/dart-sdk/bin/dart /usr/local/bin/dart
     "
+    
+    # Create backup for next time
+    echo " Creating local backup for future fast setup..."
+    tar --use-compress-program=zstd -cf "$LOCAL_BACKUP" "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu"
+    echo "✅ Backup created!"
 fi
 
-touch "$SETUP_MARKER" 2>/dev/null
+# Start Nginx
+proot-distro login ubuntu -- bash -c "nginx"
 
-echo "TermiX-Pro setup complete!"
+# Create Marker
+touch "$SETUP_MARKER"
+echo "🎉 TermiX-Pro Setup Complete!"
 echo "Run: proot-distro login ubuntu"
