@@ -60,9 +60,27 @@ else
     echo "Backup created!"
 fi
 
+echo "Configuring Nginx dashboard..."
+ROOTFS="$PREFIX/var/lib/proot-distro/containers/ubuntu/rootfs"
+mkdir -p "$ROOTFS/var/www/html"
+cat > "$ROOTFS/etc/nginx/sites-enabled/default" << 'NGINXEOF'
+server {
+    listen 8080 default_server;
+    listen [::]:8080 default_server;
+    root /var/www/html;
+    index index.html;
+    server_name _;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+NGINXEOF
+if [ ! -s "$ROOTFS/var/www/html/index.html" ]; then
+    echo "<h1>TermiX-Pro Dashboard</h1>" > "$ROOTFS/var/www/html/index.html"
+fi
+
 echo "Starting Nginx..."
-proot-distro login ubuntu -- bash -c "service mariadb start; nginx"
+proot-distro login ubuntu -- bash -c "service mariadb start; pkill nginx 2>/dev/null; sleep 1; nginx"
 
 touch "$SETUP_MARKER"
 echo "TermiX-Pro Setup Complete!"
-
