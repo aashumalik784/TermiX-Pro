@@ -61,9 +61,8 @@ else
 fi
 
 echo "Configuring Nginx dashboard..."
-ROOTFS="$PREFIX/var/lib/proot-distro/containers/ubuntu/rootfs"
-mkdir -p "$ROOTFS/var/www/html"
-cat > "$ROOTFS/etc/nginx/sites-enabled/default" << 'NGINXEOF'
+proot-distro login ubuntu -- bash -c '
+cat > /etc/nginx/sites-enabled/default << "EOF"
 server {
     listen 8080 default_server;
     listen [::]:8080 default_server;
@@ -74,10 +73,10 @@ server {
         try_files $uri $uri/ =404;
     }
 }
-NGINXEOF
-if [ ! -s "$ROOTFS/var/www/html/index.html" ]; then
-    echo "<h1>TermiX-Pro Dashboard</h1>" > "$ROOTFS/var/www/html/index.html"
-fi
+EOF
+mkdir -p /var/www/html
+echo "<h1>TermiX-Pro Dashboard</h1>" > /var/www/html/index.html
+'
 
 echo "Starting Nginx..."
 proot-distro login ubuntu -- bash -c "service mariadb start; pkill nginx 2>/dev/null; sleep 1; nginx"
