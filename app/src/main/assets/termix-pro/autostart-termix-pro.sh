@@ -75,11 +75,17 @@ server {
 }
 EOF
 mkdir -p /var/www/html
-echo "<h1>TermiX-Pro Dashboard</h1>" > /var/www/html/index.html
+if [ ! -s /var/www/html/index.html ]; then
+    echo "<h1>TermiX-Pro Dashboard</h1>" > /var/www/html/index.html
+fi
 '
 
-echo "Starting Nginx..."
-proot-distro login ubuntu -- bash -c "service mariadb start; pkill nginx 2>/dev/null; sleep 1; nginx"
+echo "Starting MariaDB and Nginx..."
+proot-distro login ubuntu -- bash -c "service mariadb start"
+pkill -f "nginx -g" 2>/dev/null
+nohup proot-distro login ubuntu -- nginx -g "daemon off;" > /dev/null 2>&1 &
+disown
+sleep 2
 
 touch "$SETUP_MARKER"
 echo "TermiX-Pro Setup Complete!"
