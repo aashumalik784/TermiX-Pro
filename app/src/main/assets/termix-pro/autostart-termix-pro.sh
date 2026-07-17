@@ -75,9 +75,7 @@ server {
 }
 EOF
 mkdir -p /var/www/html
-if [ ! -s /var/www/html/index.html ]; then
-    echo "<h1>TermiX-Pro Dashboard</h1>" > /var/www/html/index.html
-fi
+echo "<h1>TermiX-Pro Dashboard</h1>" > /var/www/html/index.html
 '
 
 echo "Starting MariaDB and Nginx..."
