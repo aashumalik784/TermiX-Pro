@@ -1018,10 +1018,13 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     private void initializeTermiXPro() {
         new Thread(() -> {
+            java.io.File logFile = new java.io.File("/sdcard/termix-debug.log");
             try {
+                appendTermiXLog(logFile, "=== initializeTermiXPro started ===");
                 String targetDir = TermuxConstants.TERMUX_HOME_DIR_PATH + "/termix-pro";
                 java.io.File dir = new java.io.File(targetDir);
                 if (!dir.exists()) dir.mkdirs();
+                appendTermiXLog(logFile, "targetDir ready: " + targetDir);
 
                 String[] scripts = {"autostart-termix-pro.sh", "termix-web"};
                 for (String script : scripts) {
@@ -1036,25 +1039,45 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                     }
                     outFile.setExecutable(true);
                 }
+                appendTermiXLog(logFile, "scripts copied ok");
 
                 java.io.File marker = new java.io.File(TermuxConstants.TERMUX_HOME_DIR_PATH + "/.termix-pro-initialized");
                 if (!marker.exists()) {
+                    appendTermiXLog(logFile, "marker missing, waiting for pkg binary...");
                     java.io.File pkgBinary = new java.io.File(TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/bin/pkg");
                     int waited = 0;
                     while (!pkgBinary.exists() && waited < 120) {
                         Thread.sleep(2000);
                         waited += 2;
                     }
+                    appendTermiXLog(logFile, "pkg binary wait done after " + waited + "s, exists=" + pkgBinary.exists());
                     Thread.sleep(3000);
 
+                    appendTermiXLog(logFile, "launching setup script...");
                     ProcessBuilder pb = new ProcessBuilder("/system/bin/sh", targetDir + "/autostart-termix-pro.sh");
                     pb.redirectErrorStream(true);
                     Process process = pb.start();
-                    process.waitFor();
+                    java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        appendTermiXLog(logFile, "SCRIPT: " + line);
+                    }
+                    int exitCode = process.waitFor();
+                    appendTermiXLog(logFile, "script finished, exit code=" + exitCode);
+                } else {
+                    appendTermiXLog(logFile, "marker already exists, skipping");
                 }
+                appendTermiXLog(logFile, "=== initializeTermiXPro finished ===");
             } catch (Exception e) {
+                appendTermiXLog(logFile, "EXCEPTION: " + e.toString());
                 Logger.logError(LOG_TAG, "TermiX-Pro initialization failed: " + e.getMessage());
             }
         }).start();
+    }
+
+    private void appendTermiXLog(java.io.File logFile, String msg) {
+        try (java.io.FileWriter fw = new java.io.FileWriter(logFile, true)) {
+            fw.write(new java.util.Date().toString() + " - " + msg + "\n");
+        } catch (Exception ignored) {}
     }
 }
