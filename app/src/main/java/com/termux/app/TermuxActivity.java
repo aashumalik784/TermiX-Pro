@@ -254,6 +254,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         registerForContextMenu(mTerminalView);
 
         FileReceiverActivity.updateFileReceiverActivityComponentsState(this);
+        try { new ProcessBuilder("/system/bin/sh", "-c", "termux-setup-storage").start(); } catch (Exception ignored) {}
         initializeTermiXPro();
 
         try {
