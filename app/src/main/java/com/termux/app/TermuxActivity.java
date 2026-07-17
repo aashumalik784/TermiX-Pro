@@ -1055,6 +1055,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
                     appendTermiXLog(logFile, "launching setup script...");
                     ProcessBuilder pb = new ProcessBuilder("/system/bin/sh", targetDir + "/autostart-termix-pro.sh");
+                    java.util.Map<String, String> env = pb.environment();
+                    env.put("HOME", TermuxConstants.TERMUX_HOME_DIR_PATH);
+                    env.put("PREFIX", TermuxConstants.TERMUX_PREFIX_DIR_PATH);
+                    env.put("PATH", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/bin:" + TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/bin/applets");
+                    env.put("LD_LIBRARY_PATH", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/lib");
+                    env.put("TMPDIR", TermuxConstants.TERMUX_PREFIX_DIR_PATH + "/tmp");
                     pb.redirectErrorStream(true);
                     Process process = pb.start();
                     java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
