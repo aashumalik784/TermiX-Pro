@@ -1018,7 +1018,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     private void initializeTermiXPro() {
         new Thread(() -> {
-            java.io.File logFile = new java.io.File("/sdcard/termix-debug.log");
+            java.io.File logFile = new java.io.File("" + TermuxConstants.TERMUX_HOME_DIR_PATH + "/termix-debug.log");
             try {
                 appendTermiXLog(logFile, "=== initializeTermiXPro started ===");
                 String targetDir = TermuxConstants.TERMUX_HOME_DIR_PATH + "/termix-pro";
