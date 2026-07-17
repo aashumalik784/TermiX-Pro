@@ -13,7 +13,7 @@ fi
 echo "Setting up TermiX-Pro Development Environment..."
 
 echo "Requesting storage permission..."
-termux-setup-storage
+yes | termux-setup-storage
 sleep 3
 
 if [ ! -d "/sdcard" ]; then

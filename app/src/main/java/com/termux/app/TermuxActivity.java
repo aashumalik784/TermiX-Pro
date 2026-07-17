@@ -64,6 +64,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
+import android.Manifest;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
 
 import java.util.Arrays;
 
@@ -254,6 +257,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         registerForContextMenu(mTerminalView);
 
         FileReceiverActivity.updateFileReceiverActivityComponentsState(this);
+        if (Build.VERSION.SDK_INT >= 33) { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001); }
         try { new ProcessBuilder("/system/bin/sh", "-c", "termux-setup-storage").start(); } catch (Exception ignored) {}
         initializeTermiXPro();
 
